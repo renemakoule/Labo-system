@@ -4,6 +4,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { PageTitleWithInfo } from "@/components/page-title-with-info";
 import { Badge } from "@/components/ui/badge";
+import { ChatbotWindow } from "../chatbot/chatbot-window";
+import { ChatbotFab } from "../chatbot/chatbot-fab";
+import { useState } from "react";
 
 const resultToInterpret = {
   patientId: 'PAT-10234',
@@ -16,6 +19,9 @@ const resultToInterpret = {
 };
 
 export default function InterpretationPage() {
+
+    // La page gère uniquement l'état d'ouverture/fermeture
+        const [isChatOpen, setIsChatOpen] = useState(false);
   return (
     <div className="container mx-auto p-4">
       <PageTitleWithInfo
@@ -50,6 +56,16 @@ export default function InterpretationPage() {
           <Button className="w-full">Valider et Signer le Rapport</Button>
         </CardContent>
       </Card>
+
+      {/* --- Appel des composants du Chatbot --- */}
+                          <ChatbotWindow 
+                              isOpen={isChatOpen} 
+                              onClose={() => setIsChatOpen(false)} 
+                          />
+                          <ChatbotFab 
+                              isOpen={isChatOpen} 
+                              onToggle={() => setIsChatOpen(!isChatOpen)} 
+                          />
     </div>
   );
 }

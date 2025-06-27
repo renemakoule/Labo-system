@@ -21,6 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { ChatbotWindow } from "../chatbot/chatbot-window"
+import { ChatbotFab } from "../chatbot/chatbot-fab"
 
 const mockResults = [
   { id: "A-139", patient: "Patient A-139", status: "pending", critical: true, discipline: "Hématologie" },
@@ -38,6 +40,9 @@ export function BiologisteValidation() {
     })
     setSelectedResult(null)
   }
+
+  // La page gère uniquement l'état d'ouverture/fermeture
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
     // 2. Envelopper le composant avec TooltipProvider
@@ -254,6 +259,15 @@ export function BiologisteValidation() {
             </div>
           )}
         </div>
+        {/* --- Appel des composants du Chatbot --- */}
+                    <ChatbotWindow 
+                        isOpen={isChatOpen} 
+                        onClose={() => setIsChatOpen(false)} 
+                    />
+                    <ChatbotFab 
+                        isOpen={isChatOpen} 
+                        onToggle={() => setIsChatOpen(!isChatOpen)} 
+                    />
       </div>
     </TooltipProvider>
   )
