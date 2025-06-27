@@ -1,0 +1,8 @@
+identifiant de connexion fictive:
+personnel@medical.labo 
+
+
+finance@medical.labo
+
+
+admin@medical.labo
