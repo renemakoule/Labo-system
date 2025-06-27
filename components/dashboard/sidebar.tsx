@@ -107,7 +107,7 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
                         <CollapsibleTrigger asChild>
                           <SidebarMenuButton
                             isActive={activeTab.startsWith(item.id)}
-                            className="w-full justify-between"
+                            className="w-full justify-between cursor-pointer"
                           >
                             <div className="flex items-center gap-2">
                               <item.icon className="h-4 w-4" />
@@ -123,6 +123,7 @@ export function DashboardSidebar({ activeTab, onTabChange }: DashboardSidebarPro
                                 <SidebarMenuSubButton
                                   isActive={activeTab === subItem.id}
                                   onClick={() => onTabChange(subItem.id)}
+                                  className="cursor-pointer"
                                 >
                                   <subItem.icon className="h-4 w-4" />
                                   <span>{subItem.title}</span>
