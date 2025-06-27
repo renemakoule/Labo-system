@@ -8,14 +8,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, Shield, Copy, Check } from "lucide-react" // Ajout de Copy et Check
 import Image from "next/image"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+// Ajout des composants pour le Tooltip
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null) // Nouvel état pour le feedback de copie
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,10 +46,18 @@ export default function LoginPage() {
     } else if (emailLower === "admin@medical.labo") {
       router.push("/admin-lab-medical")
     } else {
-      // Pour les autres emails, on peut afficher une erreur ou rediriger vers une page par défaut
       setIsLoading(false)
       alert("Adresse email non reconnue. Veuillez contacter l'administrateur.")
     }
+  }
+
+  // Nouvelle fonction pour gérer la copie dans le presse-papiers
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedEmail(text)
+      // Réinitialise l'icône après 2 secondes
+      setTimeout(() => setCopiedEmail(null), 2000)
+    })
   }
 
   return (
@@ -56,7 +75,7 @@ export default function LoginPage() {
       </div>
 
       {/* Boîte de connexion centrale */}
-      <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+      <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 backdrop-blur-sm">
         <CardContent className="p-8">
           {/* Zone A : Logo */}
           <div className="flex justify-center mb-6">
@@ -66,16 +85,109 @@ export default function LoginPage() {
           </div>
 
           {/* Zone B : Titre */}
-          <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">Portail de Connexion</h1>
+          <h1 className="text-xl font-bold text-center text-gray-900 mb-2">Portail de Connexion</h1>
 
           {/* Zone C : Texte d'instruction */}
-          <p className="text-center text-gray-600 mb-8">Veuillez vous identifier pour accéder à votre espace</p>
+          <p className="text-center text-sm leading-relaxed">Accédez à votre espace professionnel sécurisé</p>
+
+          {/* Dialog d'aide avec design amélioré */}
+          <div className="mb-4 text-center">
+            <Dialog>
+              <DialogTrigger asChild>
+                <p className="underline cursor-pointer text-blue-700 hover:text-gray-900 text-sm">
+                  {" "}
+                  Cliquez ici pour obtenir les identifiants de connexion{" "}
+                </p>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
+                <DialogHeader>
+                  <div className="flex justify-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
+                      <div className="text-white font-bold text-xl">LABO</div>
+                    </div>
+                  </div>
+                  <DialogTitle className="text-xl font-semibold text-center text-gray-800">
+                    Comptes de Démonstration
+                  </DialogTitle>
+                  <DialogDescription className="text-center text-gray-600 text-sm">
+                    Utilisez ces identifiants pour explorer les différents portails
+                  </DialogDescription>
+                </DialogHeader>
+                {/* MODIFICATION START: Enveloppe la liste dans un TooltipProvider */}
+                <TooltipProvider>
+                  <div className="grid gap-4 py-6 text-sm">
+                    <div className="space-y-4">
+                      {[
+                        {
+                          role: "Personnel Médical",
+                          email: "personnel@medical.labo",
+                          color: "from-green-500 to-emerald-600",
+                        },
+                        {
+                          role: "Gestion Financière",
+                          email: "finance@medical.labo",
+                          color: "from-orange-500 to-amber-600",
+                        },
+                        {
+                          role: "Administration",
+                          email: "admin@medical.labo",
+                          color: "from-purple-500 to-violet-600",
+                        },
+                      ].map((account, index) => (
+                        <div
+                          key={index}
+                          className="p-4 rounded-xl bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200"
+                        >
+                          <div className="flex items-center gap-3 mb-2 text-sm">
+                            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${account.color}`} />
+                            <span className="font-medium text-gray-800">{account.role}</span>
+                          </div>
+                          {/* MODIFICATION START: Conteneur pour l'email et le bouton de copie */}
+                          <div className="flex items-center justify-between gap-2 bg-blue-50 px-3 py-2 rounded-md text-sm">
+                            <code className="text-sm text-blue-600 font-mono">{account.email}</code>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-gray-500 hover:text-gray-800"
+                                  onClick={() => handleCopy(account.email)}
+                                >
+                                  {copiedEmail === account.email ? (
+                                    <Check className="h-4 w-4 text-green-600" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                  <span className="sr-only">Copier l'adresse</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent className="bg-gray-800 text-white border-0">
+                                <p className="text-center">Copiez l'adresse, collez-la dans le champ email.</p>
+                                <p className="text-center">entrez n'importe quel mot de passe et validez. appuyez sur l'espace de votre ecran pour fermer le dialog.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          {/* MODIFICATION END */}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200 text-sm">
+                      <p className="text-sm text-blue-800 text-center">
+                        <strong>Mot de passe :</strong> Saisissez n'importe quel mot de passe
+                      </p>
+                    </div>
+                  </div>
+                </TooltipProvider>
+                {/* MODIFICATION END */}
+              </DialogContent>
+            </Dialog>
+          </div>
 
           {/* Zone D : Formulaire */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Champ Email */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-900">
                 Adresse email
               </Label>
               <Input
@@ -91,7 +203,7 @@ export default function LoginPage() {
 
             {/* Champ Mot de passe */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-900">
                 Mot de passe
               </Label>
               <div className="relative">
