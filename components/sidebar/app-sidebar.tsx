@@ -37,6 +37,7 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 const navigationData = {
   navMain: [
@@ -197,11 +198,14 @@ export function AppSidebar({ activeView, onViewChange, ...props }: AppSidebarPro
       <SidebarHeader className="p-4 border-b">
         <div className="flex items-center space-x-3">
           <div className="flex-shrink-0">
-            <FlaskConical className="h-8 w-8 text-blue-600" />
+            <Avatar className="h-10 w-10">
+                    <AvatarImage src="/78524.png?height=32&width=32" alt="LMD" />
+                    <AvatarFallback>LMD</AvatarFallback>
+                  </Avatar>
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="font-bold text-lg text-gray-900 truncate">LABO</h2>
-            <p className="text-xs text-gray-500 truncate">Laboratoire Médical</p>
+            <h2 className="font-bold text-lg text-gray-900 truncate">LMD</h2>
+            <p className="text-xs text-gray-500 text-center">Laboratoire D'analyse Médical DABE</p>
           </div>
         </div>
       </SidebarHeader>

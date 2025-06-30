@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Eye, EyeOff, Loader2, Shield, Copy, Check } from "lucide-react" // Ajout de Copy et Check
+import { Eye, EyeOff, Loader2, Shield, Copy, Check } from "lucide-react"
 import Image from "next/image"
 import {
   Dialog,
@@ -18,25 +18,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-// Ajout des composants pour le Tooltip
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [copiedEmail, setCopiedEmail] = useState<string | null>(null) // Nouvel état pour le feedback de copie
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulation d'une vérification (délai de 1.5 secondes)
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    // Logique de redirection basée sur l'email
     const emailLower = email.toLowerCase()
 
     if (emailLower === "personnel@medical.labo") {
@@ -51,11 +49,9 @@ export default function LoginPage() {
     }
   }
 
-  // Nouvelle fonction pour gérer la copie dans le presse-papiers
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedEmail(text)
-      // Réinitialise l'icône après 2 secondes
       setTimeout(() => setCopiedEmail(null), 2000)
     })
   }
@@ -77,12 +73,14 @@ export default function LoginPage() {
       {/* Boîte de connexion centrale */}
       <Card className="w-full max-w-md relative z-10 shadow-2xl border-0 backdrop-blur-sm">
         <CardContent className="p-8">
-          {/* Zone A : Logo */}
+          {/* Zone A : Logo - MODIFIÉ */}
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
-              <div className="text-white font-bold text-xl">LABO</div>
-            </div>
+            <Avatar className="h-16 w-16">
+                    <AvatarImage src="/78524.png?height=32&width=32" alt="LMD" />
+                    <AvatarFallback>LMD</AvatarFallback>
+                  </Avatar>
           </div>
+          <p className="text-center text-xs">Laboratoire D'Analyse Medical DABE</p>
 
           {/* Zone B : Titre */}
           <h1 className="text-xl font-bold text-center text-gray-900 mb-2">Portail de Connexion</h1>
@@ -101,10 +99,21 @@ export default function LoginPage() {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px] bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
                 <DialogHeader>
-                  <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
-                      <div className="text-white font-bold text-xl">LABO</div>
-                    </div>
+                  {/* Logo dans le dialog - MODIFIÉ */}
+                  {/* <div className="flex justify-center mb-6 rounded-full">
+                    <Image
+                      src="/labo.jpg"
+                      alt="Logo Laboratoire"
+                      width={64}
+                      height={64}
+                      className="rounded-full object-cover"
+                    />
+                  </div> */}
+                  <div className="flex justify-center mb-6 rounded-full">
+                    <Avatar className="h-16 w-16">
+                    <AvatarImage src="/78524.png?height=32&width=32" alt="Dr. Marie Dubois" />
+                    <AvatarFallback>LMD</AvatarFallback>
+                  </Avatar>
                   </div>
                   <DialogTitle className="text-xl font-semibold text-center text-gray-800">
                     Comptes de Démonstration
@@ -113,7 +122,6 @@ export default function LoginPage() {
                     Utilisez ces identifiants pour explorer les différents portails
                   </DialogDescription>
                 </DialogHeader>
-                {/* MODIFICATION START: Enveloppe la liste dans un TooltipProvider */}
                 <TooltipProvider>
                   <div className="grid gap-4 py-6 text-sm">
                     <div className="space-y-4">
@@ -142,7 +150,6 @@ export default function LoginPage() {
                             <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${account.color}`} />
                             <span className="font-medium text-gray-800">{account.role}</span>
                           </div>
-                          {/* MODIFICATION START: Conteneur pour l'email et le bouton de copie */}
                           <div className="flex items-center justify-between gap-2 bg-blue-50 px-3 py-2 rounded-md text-sm">
                             <code className="text-sm text-blue-600 font-mono">{account.email}</code>
                             <Tooltip>
@@ -167,7 +174,6 @@ export default function LoginPage() {
                               </TooltipContent>
                             </Tooltip>
                           </div>
-                          {/* MODIFICATION END */}
                         </div>
                       ))}
                     </div>
@@ -178,7 +184,6 @@ export default function LoginPage() {
                     </div>
                   </div>
                 </TooltipProvider>
-                {/* MODIFICATION END */}
               </DialogContent>
             </Dialog>
           </div>
