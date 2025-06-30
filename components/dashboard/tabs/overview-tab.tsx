@@ -9,13 +9,13 @@ import { InfoTooltip } from "@/components/dashboard/info-tooltip"
 
 // Données simulées
 const treasuryData = [
-  { date: "01/12", amount: 45000 },
-  { date: "05/12", amount: 48000 },
-  { date: "10/12", amount: 52000 },
-  { date: "15/12", amount: 49000 },
-  { date: "20/12", amount: 55000 },
-  { date: "25/12", amount: 58000 },
-  { date: "30/12", amount: 62000 },
+  { date: "01/12", amount: 4500000 },
+  { date: "05/12", amount: 4800000 },
+  { date: "10/12", amount: 5200000 },
+  { date: "15/12", amount: 4900000 },
+  { date: "20/12", amount: 5500000 },
+  { date: "25/12", amount: 5800000 },
+  { date: "30/12", amount: 6200000 },
 ]
 
 export function OverviewTab() {
@@ -25,7 +25,7 @@ export function OverviewTab() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <KPICard
           title="Chiffre d'Affaires"
-          value="€ 125,430"
+          value="12,543,000 FCFA"
           change={{ value: "+12.5% vs mois dernier", type: "positive" }}
           icon={DollarSign}
         >
@@ -40,15 +40,15 @@ export function OverviewTab() {
 
         <KPICard
           title="Trésorerie Actuelle"
-          value="€ 62,000"
+          value="6,200,000 FCFA"
           change={{ value: "+8.2% ce mois", type: "positive" }}
           icon={TrendingUp}
         />
 
         <KPICard
           title="Créances Clients"
-          value="€ 18,750"
-          change={{ value: "€ 3,200 en retard", type: "negative" }}
+          value="1,875,000 FCFA"
+          change={{ value: "320,000 FCFA en retard", type: "negative" }}
           icon={Users}
         />
 
@@ -75,8 +75,8 @@ export function OverviewTab() {
               <LineChart data={treasuryData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`€ ${value?.toLocaleString()}`, "Trésorerie"]} />
+                <YAxis tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`} />
+                <Tooltip formatter={(value) => [`${value?.toLocaleString()} FCFA`, "Trésorerie"]} />
                 <Line
                   type="monotone"
                   dataKey="amount"
@@ -101,7 +101,7 @@ export function OverviewTab() {
             <CardDescription>3 factures nécessitent un suivi</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">€ 3,200</div>
+            <div className="text-2xl font-bold text-destructive">320,000 FCFA</div>
           </CardContent>
         </Card>
 
@@ -114,7 +114,7 @@ export function OverviewTab() {
             <CardDescription>Produits expirant dans 30 jours</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">€ 1,850</div>
+            <div className="text-2xl font-bold text-orange-600">185,000 FCFA</div>
           </CardContent>
         </Card>
 
@@ -127,7 +127,7 @@ export function OverviewTab() {
             <CardDescription>Génèrent 78% du CA</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">€ 97,835</div>
+            <div className="text-2xl font-bold text-green-600">9,783,500 FCFA</div>
           </CardContent>
         </Card>
       </div>

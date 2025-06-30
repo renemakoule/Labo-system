@@ -11,95 +11,102 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-// 1. Importer l'icône "Info" et les composants du Tooltip
 import { Search, FileText, Plus, Eye, Download, Printer, Edit, Info } from "lucide-react"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+
+// Définition des types pour une meilleure sécurité et auto-complétion
+interface Exam {
+  name: string;
+  price: number;
+  category: string;
+}
+
+interface SelectedExam extends Exam {
+  quantity: number;
+}
 
 const mockInvoices = [
   {
     id: "FACT-2024-001",
     patientId: "A-140",
-    patient: "Patient A-140",
     date: "15/01/2024",
-    amount: 145.5,
+    amount: 145500,
     status: "paid",
     items: [
-      { name: "Numération Formule Sanguine", price: 45.0 },
-      { name: "Glycémie à jeun", price: 25.0 },
-      { name: "Cholestérol total", price: 30.0 },
-      { name: "Consultation", price: 45.5 },
+      { name: "Numération Formule Sanguine", price: 45000 },
+      { name: "Glycémie à jeun", price: 25000 },
+      { name: "Cholestérol total", price: 30000 },
+      { name: "Consultation", price: 45500 },
     ],
   },
   {
     id: "FACT-2024-002",
     patientId: "A-141",
-    patient: "Patient A-141",
     date: "15/01/2024",
-    amount: 89.0,
+    amount: 89000,
     status: "pending",
     items: [
-      { name: "Hémoglobine glyquée", price: 65.0 },
-      { name: "Consultation", price: 24.0 },
+      { name: "Hémoglobine glyquée", price: 65000 },
+      { name: "Consultation", price: 24000 },
     ],
   },
   {
     id: "FACT-2024-003",
     patientId: "A-137",
-    patient: "Patient A-137",
     date: "14/01/2024",
-    amount: 120.0,
+    amount: 120000,
     status: "overdue",
     items: [
-      { name: "Bilan hépatique complet", price: 95.0 },
-      { name: "Consultation", price: 25.0 },
+      { name: "Bilan hépatique complet", price: 95000 },
+      { name: "Consultation", price: 25000 },
     ],
   },
 ]
 
-const mockExams = [
-  { name: "Numération Formule Sanguine", price: 45.0, category: "Hématologie" },
-  { name: "Glycémie à jeun", price: 25.0, category: "Biochimie" },
-  { name: "Cholestérol total", price: 30.0, category: "Biochimie" },
-  { name: "Hémoglobine glyquée", price: 65.0, category: "Biochimie" },
-  { name: "Bilan hépatique complet", price: 95.0, category: "Biochimie" },
-  { name: "TSH", price: 40.0, category: "Hormonologie" },
+const mockExams: Exam[] = [
+  { name: "Numération Formule Sanguine", price: 45000, category: "Hématologie" },
+  { name: "Glycémie à jeun", price: 25000, category: "Biochimie" },
+  { name: "Cholestérol total", price: 30000, category: "Biochimie" },
+  { name: "Hémoglobine glyquée", price: 65000, category: "Biochimie" },
+  { name: "Bilan hépatique complet", price: 95000, category: "Biochimie" },
+  { name: "TSH", price: 40000, category: "Hormonologie" },
 ]
 
 export function AccueilFacture() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedPatient, setSelectedPatient] = useState("")
-  const [selectedExams, setSelectedExams] = useState([])
+  const [selectedPatientId, setSelectedPatientId] = useState("")
+  // <- CORRECTION: Typage explicite du state pour que TypeScript connaisse la structure des objets dans le tableau.
+  const [selectedExams, setSelectedExams] = useState<SelectedExam[]>([])
   const [invoiceNotes, setInvoiceNotes] = useState("")
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
   const filteredInvoices = mockInvoices.filter(
     (invoice) =>
-      invoice.patient.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.patientId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase()),
   )
-
-  const addExamToInvoice = (exam: { name: any; price?: number; category?: string }) => {
+  
+  // <- CORRECTION: Typage de l'argument 'exam'
+  const addExamToInvoice = (exam: Exam) => {
+    // 'item.name' est maintenant accessible car TypeScript sait que 'item' est de type SelectedExam
     if (!selectedExams.find((item) => item.name === exam.name)) {
+      // Le nouvel objet correspond bien au type SelectedExam
       setSelectedExams([...selectedExams, { ...exam, quantity: 1 }])
     }
   }
-
-  const removeExamFromInvoice = (examName: any) => {
+  
+  // <- CORRECTION: Typage de l'argument 'examName'
+  const removeExamFromInvoice = (examName: string) => {
     setSelectedExams(selectedExams.filter((item) => item.name !== examName))
   }
 
   const calculateTotal = () => {
+    // 'item.price' et 'item.quantity' sont maintenant accessibles
     return selectedExams.reduce((total, item) => total + item.price * item.quantity, 0)
   }
 
   const handleCreateInvoice = () => {
-    if (!selectedPatient || selectedExams.length === 0) {
+    if (!selectedPatientId || selectedExams.length === 0) {
       toast({
         title: "Erreur",
         description: "Veuillez sélectionner un patient et au moins un examen",
@@ -111,23 +118,21 @@ export function AccueilFacture() {
     const newInvoiceId = `FACT-2024-${String(mockInvoices.length + 1).padStart(3, "0")}`
     toast({
       title: "Facture créée",
-      description: `Facture ${newInvoiceId} créée pour ${selectedPatient}`,
+      description: `Facture ${newInvoiceId} créée pour le patient ${selectedPatientId}`,
     })
 
     // Reset form
-    setSelectedPatient("")
+    setSelectedPatientId("")
     setSelectedExams([])
     setInvoiceNotes("")
     setShowCreateDialog(false)
   }
 
   return (
-    // 2. Envelopper le composant avec TooltipProvider
     <TooltipProvider>
       <ScrollArea className="h-full">
         <div className="p-6 space-y-6 max-w-7xl mx-auto">
           <div className="mb-8">
-            {/* 3. Modifier la structure du titre pour inclure l'icône */}
             <div className="flex items-center gap-2 mb-2">
               <h1 className="text-3xl font-bold text-gray-900">Gestion des Factures</h1>
               <Tooltip>
@@ -144,7 +149,6 @@ export function AccueilFacture() {
             <p className="text-gray-600">Création et suivi des factures patients</p>
           </div>
 
-          {/* Statistiques */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardHeader className="pb-2">
@@ -160,7 +164,7 @@ export function AccueilFacture() {
                 <CardTitle className="text-sm font-medium">Montant Total</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">2,450 DH</div>
+                <div className="text-2xl font-bold text-green-600">2 450 000 FCFA</div>
                 <p className="text-xs text-muted-foreground">Factures du jour</p>
               </CardContent>
             </Card>
@@ -184,7 +188,6 @@ export function AccueilFacture() {
             </Card>
           </div>
 
-          {/* Actions principales */}
           <div className="flex space-x-4 mb-6">
             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
               <DialogTrigger asChild>
@@ -200,17 +203,14 @@ export function AccueilFacture() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="patient">Patient</Label>
-                      <Select value={selectedPatient} onValueChange={setSelectedPatient}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un patient" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Patient A-140">Patient A-140</SelectItem>
-                          <SelectItem value="Patient A-141">Patient A-141</SelectItem>
-                          <SelectItem value="Patient A-142">Patient A-142</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="patientId">ID Patient *</Label>
+                      <Input
+                        id="patientId"
+                        value={selectedPatientId}
+                        onChange={(e) => setSelectedPatientId(e.target.value)}
+                        placeholder="Entrer le code unique du patient"
+                        className="mt-1"
+                      />
                     </div>
                     <div>
                       <Label>Date de facturation</Label>
@@ -231,7 +231,7 @@ export function AccueilFacture() {
                         >
                           <div className="text-left">
                             <div className="font-medium text-xs">{exam.name}</div>
-                            <div className="text-xs text-gray-500">{exam.price} DH</div>
+                            <div className="text-xs text-gray-500">{exam.price} FCFA</div>
                           </div>
                         </Button>
                       ))}
@@ -245,7 +245,7 @@ export function AccueilFacture() {
                         <div key={item.name} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                           <span className="text-sm">{item.name}</span>
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium">{item.price} DH</span>
+                            <span className="text-sm font-medium">{item.price} FCFA</span>
                             <Button variant="outline" size="sm" onClick={() => removeExamFromInvoice(item.name)}>
                               ×
                             </Button>
@@ -257,7 +257,7 @@ export function AccueilFacture() {
                       <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                         <div className="flex justify-between items-center">
                           <span className="font-semibold">Total:</span>
-                          <span className="text-xl font-bold text-blue-600">{calculateTotal()} DH</span>
+                          <span className="text-xl font-bold text-blue-600">{calculateTotal()} FCFA</span>
                         </div>
                       </div>
                     )}
@@ -284,7 +284,7 @@ export function AccueilFacture() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
-                placeholder="Rechercher une facture..."
+                placeholder="Rechercher par ID facture ou ID patient..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -292,7 +292,6 @@ export function AccueilFacture() {
             </div>
           </div>
 
-          {/* Liste des factures */}
           <Card>
             <CardHeader>
               <CardTitle>Historique des Factures</CardTitle>
@@ -307,12 +306,12 @@ export function AccueilFacture() {
                     <div className="flex items-center space-x-4 min-w-0 flex-1">
                       <div className="min-w-0 flex-1">
                         <h3 className="font-semibold text-gray-900 truncate">
-                          {invoice.id} - {invoice.patient}
+                          {invoice.id} - Patient {invoice.patientId}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Date: {invoice.date} • Montant: {invoice.amount} DH
+                          Date: {invoice.date} • Montant: {invoice.amount.toLocaleString()} FCFA
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 truncate">
                           {invoice.items.length} examen(s) • {invoice.items.map((item) => item.name).join(", ")}
                         </p>
                       </div>
@@ -330,18 +329,10 @@ export function AccueilFacture() {
                         {invoice.status === "paid" ? "Payée" : invoice.status === "pending" ? "En attente" : "En retard"}
                       </Badge>
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Printer className="h-4 w-4" />
-                        </Button>
+                        <Button variant="outline" size="sm"><Eye className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="sm"><Edit className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="sm"><Download className="h-4 w-4" /></Button>
+                        <Button variant="outline" size="sm"><Printer className="h-4 w-4" /></Button>
                       </div>
                     </div>
                   </div>
