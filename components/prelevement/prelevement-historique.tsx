@@ -1,3 +1,8 @@
+//components/prelevement/prelevement-historique.tsx
+'use client';
+
+// SUPPRIMER : import { useTranslations } from "next-intl";
+import { useLanguage } from "@/context/language-context"; // UTILISER NOTRE HOOK
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -18,25 +23,34 @@ const sampleHistory: Sample[] = [
 ];
 
 export default function HistoriquePrelevementPage() {
+  // CORRECTION : Utiliser notre hook et les bonnes clés
+  const { t } = useLanguage();
+
+  const getStatusTranslation = (status: 'Terminé' | 'En attente') => {
+    return status === 'Terminé' 
+      ? t('HistoriquePrelevement.statusCompleted')
+      : t('HistoriquePrelevement.statusPending');
+  };
+
   return (
     <div className="container mx-auto p-4">
       <PageTitleWithInfo
-        title="Historique des Prélèvements"
-        infoText="Consultez la liste de tous les prélèvements enregistrés dans le système, identifiés par leur code unique."
+        title={t('HistoriquePrelevement.pageTitle')}
+        infoText={t('HistoriquePrelevement.pageInfo')}
       />
       <Card>
         <CardHeader>
-          <CardTitle>Historique des Prélèvements</CardTitle>
+          <CardTitle>{t('HistoriquePrelevement.cardTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID Prélèvement</TableHead>
-                <TableHead>ID Patient</TableHead>
-                <TableHead>Date et Heure</TableHead>
-                <TableHead>Technicien</TableHead>
-                <TableHead>Statut</TableHead>
+                <TableHead>{t('HistoriquePrelevement.headerSampleId')}</TableHead>
+                <TableHead>{t('HistoriquePrelevement.headerPatientId')}</TableHead>
+                <TableHead>{t('HistoriquePrelevement.headerDateTime')}</TableHead>
+                <TableHead>{t('HistoriquePrelevement.headerTechnician')}</TableHead>
+                <TableHead>{t('HistoriquePrelevement.headerStatus')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -48,7 +62,7 @@ export default function HistoriquePrelevementPage() {
                   <TableCell>{sample.technician}</TableCell>
                   <TableCell>
                     <Badge variant={sample.status === 'Terminé' ? 'default' : 'secondary'}>
-                      {sample.status}
+                      {getStatusTranslation(sample.status)}
                     </Badge>
                   </TableCell>
                 </TableRow>

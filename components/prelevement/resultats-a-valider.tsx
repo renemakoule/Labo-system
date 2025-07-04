@@ -1,6 +1,9 @@
-'use client'; // Le composant devient interactif, donc 'use client' est nécessaire
+//components/prelevement/resultats-a-valider.tsx
+'use client'; 
 
 import { useState } from 'react';
+// SUPPRIMER : import { useTranslations } from "next-intl";
+import { useLanguage } from '@/context/language-context'; // UTILISER NOTRE HOOK
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -10,22 +13,18 @@ import { PageTitleWithInfo } from "@/components/page-title-with-info";
 import { MoreHorizontal } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-// --- NOUVELLE DÉFINITION DES TYPES ---
-// Type pour les statuts possibles à ce stade
 type ValidationStatus = 'En attente de validation' | 'Validé technique' | 'Rejeté (à refaire)';
 
-// Type de l'objet résultat, enrichi avec le statut
 type ResultToValidate = {
     sampleId: string;
     patientId: string;
     analysis: string;
     result: string;
     reference: string;
-    flag?: 'H' | 'L'; // High or Low
+    flag?: 'H' | 'L';
     status: ValidationStatus;
 };
 
-// --- DONNÉES MOCK INITIALES ---
 const initialResultsData: ResultToValidate[] = [
     { sampleId: 'SMP-001', patientId: 'PAT-10172', analysis: 'Hémoglobine', result: '14.5 g/dL', reference: '12.0 - 16.0', status: 'En attente de validation' },
     { sampleId: 'SMP-002', patientId: 'PAT-10290', analysis: 'Leucocytes', result: '11,500 /mm³', reference: '4,000 - 11,000', flag: 'H', status: 'En attente de validation' },
@@ -35,56 +34,58 @@ const initialResultsData: ResultToValidate[] = [
 
 export default function ResultatsAValiderPage() {
     const { toast } = useToast();
-    // Utilisation de useState pour gérer l'état des résultats de manière interactive
     const [results, setResults] = useState<ResultToValidate[]>(initialResultsData);
+    // CORRECTION : Utiliser notre hook
+    const { t } = useLanguage();
 
-    // Fonction pour changer le statut d'une analyse
+    const getStatusTranslation = (status: ValidationStatus) => {
+        const keyMap = {
+            'En attente de validation': 'ResultatsAValider.statusPending',
+            'Validé technique': 'ResultatsAValider.statusValidated',
+            'Rejeté (à refaire)': 'ResultatsAValider.statusRejected'
+        };
+        return t(keyMap[status]);
+    };
+
     const handleStatusChange = (sampleId: string, newStatus: ValidationStatus) => {
         setResults(currentResults =>
             currentResults.map(result =>
                 result.sampleId === sampleId ? { ...result, status: newStatus } : result
             )
         );
-        toast({
-            title: "Mise à jour réussie",
-            description: `Le statut de l'analyse ${sampleId} est maintenant : ${newStatus}.`,
+        toast({ 
+            title: t('ResultatsAValider.toastTitle'), 
+            description: `${t('ResultatsAValider.toastDescription1')} ${sampleId} ${t('ResultatsAValider.toastDescription2')} ${getStatusTranslation(newStatus)}.` 
         });
     };
     
-    // Fonction pour déterminer la couleur du badge en fonction du statut
     const getBadgeVariant = (status: ValidationStatus): "default" | "secondary" | "destructive" | "outline" => {
         switch (status) {
-            case 'Validé technique':
-                return 'default'; // Fond bleu/noir (succès)
-            case 'Rejeté (à refaire)':
-                return 'destructive'; // Fond rouge (erreur/rejet)
-            case 'En attente de validation':
-            default:
-                return 'secondary'; // Fond gris (en attente)
+            case 'Validé technique': return 'default';
+            case 'Rejeté (à refaire)': return 'destructive';
+            case 'En attente de validation': default: return 'secondary';
         }
     };
 
     return (
         <div className="container mx-auto p-4">
              <PageTitleWithInfo
-                title="Validation Technique des Résultats"
-                infoText="Vérifiez les résultats bruts sortis des automates avant de les transmettre pour validation biologique."
+                title={t('ResultatsAValider.pageTitle')}
+                infoText={t('ResultatsAValider.pageInfo')}
             />
             <Card>
-                <CardHeader>
-                    <CardTitle>Résultats techniques à valider</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>{t('ResultatsAValider.cardTitle')}</CardTitle></CardHeader>
                 <CardContent>
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[120px]">ID Analyse</TableHead>
-                                <TableHead>Analyse</TableHead>
-                                <TableHead>ID Patient</TableHead>
-                                <TableHead>Résultat</TableHead>
-                                <TableHead>Ref.</TableHead>
-                                <TableHead>Statut</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="w-[120px]">{t('ResultatsAValider.headerSampleId')}</TableHead>
+                                <TableHead>{t('ResultatsAValider.headerAnalysis')}</TableHead>
+                                <TableHead>{t('ResultatsAValider.headerPatientId')}</TableHead>
+                                <TableHead>{t('ResultatsAValider.headerResult')}</TableHead>
+                                <TableHead>{t('ResultatsAValider.headerReference')}</TableHead>
+                                <TableHead>{t('ResultatsAValider.headerStatus')}</TableHead>
+                                <TableHead className="text-end">{t('ResultatsAValider.headerActions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -96,43 +97,22 @@ export default function ResultatsAValiderPage() {
                                     <TableCell className="font-mono">
                                         {item.result} 
                                         {item.flag && (
-                                            <span className={`font-bold ml-2 ${item.flag === 'H' ? 'text-red-500' : 'text-blue-500'}`}>
+                                            <span className={`font-bold ms-2 ${item.flag === 'H' ? 'text-red-500' : 'text-blue-500'}`}>
                                                 ({item.flag})
                                             </span>
                                         )}
                                     </TableCell>
                                     <TableCell className="font-mono text-sm text-gray-500">{item.reference}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={getBadgeVariant(item.status)}>{item.status}</Badge>
-                                    </TableCell>
-                                    <TableCell className="text-right">
+                                    <TableCell><Badge variant={getBadgeVariant(item.status)}>{getStatusTranslation(item.status)}</Badge></TableCell>
+                                    <TableCell className="text-end">
                                         <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                                    <span className="sr-only">Ouvrir le menu</span>
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
+                                            <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><span className="sr-only">Ouvrir le menu</span><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem
-                                                    onClick={() => handleStatusChange(item.sampleId, 'Validé technique')}
-                                                    disabled={item.status === 'Validé technique'}
-                                                >
-                                                    Valider Technique
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                    onClick={() => handleStatusChange(item.sampleId, 'Rejeté (à refaire)')}
-                                                    disabled={item.status === 'Rejeté (à refaire)'}
-                                                >
-                                                    Rejeter (à refaire)
-                                                </DropdownMenuItem>
+                                                <DropdownMenuLabel>{t('ResultatsAValider.actionLabel')}</DropdownMenuLabel>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(item.sampleId, 'Validé technique')} disabled={item.status === 'Validé technique'}>{t('ResultatsAValider.actionValidate')}</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(item.sampleId, 'Rejeté (à refaire)')} disabled={item.status === 'Rejeté (à refaire)'}>{t('ResultatsAValider.actionReject')}</DropdownMenuItem>
                                                 <DropdownMenuSeparator />
-                                                <DropdownMenuItem
-                                                    onClick={() => handleStatusChange(item.sampleId, 'En attente de validation')}
-                                                >
-                                                    Remettre en attente
-                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleStatusChange(item.sampleId, 'En attente de validation')}>{t('ResultatsAValider.actionSetPending')}</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

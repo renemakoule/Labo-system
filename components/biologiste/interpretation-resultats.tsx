@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from "react";
+import { useLanguage } from "@/context/language-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,7 +10,6 @@ import { PageTitleWithInfo } from "@/components/page-title-with-info";
 import { Badge } from "@/components/ui/badge";
 import { ChatbotWindow } from "../chatbot/chatbot-window";
 import { ChatbotFab } from "../chatbot/chatbot-fab";
-import { useState } from "react";
 
 const resultToInterpret = {
   patientId: 'PAT-10234',
@@ -19,25 +22,33 @@ const resultToInterpret = {
 };
 
 export default function InterpretationPage() {
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const { t } = useLanguage();
 
-    // La page gère uniquement l'état d'ouverture/fermeture
-        const [isChatOpen, setIsChatOpen] = useState(false);
   return (
     <div className="container mx-auto p-4">
       <PageTitleWithInfo
-        title="Interprétation et Validation Biologique"
-        infoText="Analysez les résultats techniques, ajoutez votre interprétation et signez électroniquement pour finaliser le rapport."
+        title={t('InterpretationResultats.pageTitle')}
+        infoText={t('InterpretationResultats.pageInfo')}
       />
       <Card>
         <CardHeader>
-          <CardTitle>Dossier à Interpréter</CardTitle>
-          <CardDescription>ID Patient : {resultToInterpret.patientId} - Né(e) le: {resultToInterpret.dob}</CardDescription>
+          <CardTitle>{t('InterpretationResultats.cardTitle')}</CardTitle>
+          <CardDescription>
+            {t('InterpretationResultats.patientId')}: {resultToInterpret.patientId} - {t('InterpretationResultats.dob')}: {resultToInterpret.dob}
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div>
-            <h3 className="font-semibold mb-2">Résultats Bruts</h3>
+            <h3 className="font-semibold mb-2">{t('InterpretationResultats.rawResults')}</h3>
             <Table>
-                <TableHeader><TableRow><TableHead>Paramètre</TableHead><TableHead>Résultat</TableHead><TableHead>Valeurs de référence</TableHead></TableRow></TableHeader>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t('InterpretationResultats.headerParam')}</TableHead>
+                        <TableHead>{t('InterpretationResultats.headerResult')}</TableHead>
+                        <TableHead>{t('InterpretationResultats.headerReference')}</TableHead>
+                    </TableRow>
+                </TableHeader>
                 <TableBody>
                     {resultToInterpret.results.map(r => (
                         <TableRow key={r.param}>
@@ -50,22 +61,15 @@ export default function InterpretationPage() {
             </Table>
           </div>
           <div className="grid gap-2">
-            <h3 className="font-semibold">Ajouter une Interprétation et Conclusion</h3>
-            <Textarea placeholder="Ex: Hyperkaliémie et hypernatrémie modérées. A corréler à la clinique et à un éventuel traitement..." />
+            <h3 className="font-semibold">{t('InterpretationResultats.addInterpretationTitle')}</h3>
+            <Textarea placeholder={t('InterpretationResultats.addInterpretationPlaceholder')} />
           </div>
-          <Button className="w-full">Valider et Signer le Rapport</Button>
+          <Button className="w-full">{t('InterpretationResultats.submitButton')}</Button>
         </CardContent>
       </Card>
 
-      {/* --- Appel des composants du Chatbot --- */}
-                          <ChatbotWindow 
-                              isOpen={isChatOpen} 
-                              onClose={() => setIsChatOpen(false)} 
-                          />
-                          <ChatbotFab 
-                              isOpen={isChatOpen} 
-                              onToggle={() => setIsChatOpen(!isChatOpen)} 
-                          />
+      <ChatbotWindow isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      <ChatbotFab isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
     </div>
   );
 }

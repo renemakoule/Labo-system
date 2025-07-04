@@ -8,10 +8,16 @@ type DateRange = {
   to: Date
 }
 
+// Le type a été mis à jour pour utiliser une clé de traduction
+export type PresetRange = {
+  labelKey: string;
+  range: DateRange;
+}
+
 type DateRangeContextType = {
   dateRange: DateRange
   setDateRange: (range: DateRange) => void
-  presetRanges: { label: string; range: DateRange }[]
+  presetRanges: PresetRange[] // Le type a été mis à jour
 }
 
 const DateRangeContext = createContext<DateRangeContextType | undefined>(undefined)
@@ -22,25 +28,26 @@ export function DateRangeProvider({ children }: { children: ReactNode }) {
     to: endOfMonth(new Date()),
   })
 
-  const presetRanges = [
+  // On utilise `labelKey` au lieu de `label`
+  const presetRanges: PresetRange[] = [
     {
-      label: "Aujourd'hui",
+      labelKey: "today",
       range: { from: new Date(), to: new Date() },
     },
     {
-      label: "Cette Semaine",
+      labelKey: "thisWeek",
       range: { from: subDays(new Date(), 7), to: new Date() },
     },
     {
-      label: "Ce Mois",
+      labelKey: "thisMonth",
       range: { from: startOfMonth(new Date()), to: endOfMonth(new Date()) },
     },
     {
-      label: "Mois Dernier",
+      labelKey: "lastMonth",
       range: { from: startOfMonth(subMonths(new Date(), 1)), to: endOfMonth(subMonths(new Date(), 1)) },
     },
     {
-      label: "Dernier Trimestre",
+      labelKey: "lastQuarter",
       range: { from: startOfQuarter(subQuarters(new Date(), 1)), to: endOfQuarter(subQuarters(new Date(), 1)) },
     },
   ]

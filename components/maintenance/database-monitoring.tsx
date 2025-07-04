@@ -1,3 +1,8 @@
+"use client" // Assurez-vous que ce composant est un client component
+
+// Importez votre hook useLanguage depuis le chemin correct
+import { useLanguage } from '@/context/language-context';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -6,19 +11,24 @@ import { Database, Zap, Settings, Play, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function DatabaseMonitoring() {
+  // Utilisez votre hook useLanguage
+  const { t } = useLanguage();
+
+  // Les données statiques pour dbStats.uptime doivent être des clés de traduction
   const dbStats = {
-    size: "15.2 GB",
+    size: "15.2 GB", // Peut être traduit aussi si l'unité change
     queriesPerSecond: 45,
     connections: 12,
-    uptime: "15 jours 8h 32min",
-  }
+    uptimeKey: "uptimeValue", // Clé de traduction pour le temps de fonctionnement
+  };
 
+  // Les requêtes lentes seront traduites via leurs détails
   const slowQueries = [
     {
-      query: "SELECT * FROM patients WHERE...",
+      query: "SELECT * FROM patients WHERE...", // La requête elle-même reste en code, mais le message d'impact est traduit
       duration: "2.3s",
       frequency: "15/min",
-      impact: "high",
+      impact: "high", // Clé pour la traduction de l'impact
     },
     {
       query: "UPDATE factures SET status...",
@@ -32,44 +42,39 @@ export function DatabaseMonitoring() {
       frequency: "25/min",
       impact: "medium",
     },
-  ]
+  ];
 
   const getImpactBadge = (impact: string) => {
     switch (impact) {
       case "high":
-        return <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">Élevé</span>
+        return <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">{t('DatabaseMonitoring.impactHigh')}</span>
       case "medium":
-        return <span className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">Moyen</span>
+        return <span className="px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded">{t('DatabaseMonitoring.impactMedium')}</span>
       case "low":
-        return <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Faible</span>
+        return <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">{t('DatabaseMonitoring.impactLow')}</span>
       default:
-        return <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">Inconnu</span>
+        return <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">{t('DatabaseMonitoring.impactUnknown')}</span>
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <h1 className="text-2xl font-bold text-gray-900">Monitoring Base de Données</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('DatabaseMonitoring.title')}</h1>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Info className="h-5 w-5 text-gray-400 hover:text-gray-600" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>
-                  Surveillance et optimisation de la base de données du laboratoire.
-                  <br />
-                  Monitoring des performances, requêtes lentes, connexions actives
-                  <br />
-                  et outils de maintenance préventive pour assurer la stabilité.
-                </p>
+                {/* InfoTooltip content est traduit directement ici */}
+                <p>{t('DatabaseMonitoring.infoTooltip')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
-        <p className="text-gray-600">Surveillance et optimisation de la base de données</p>
+        <p className="text-gray-600">{t('DatabaseMonitoring.description')}</p>
       </div>
 
       <div className="space-y-6">
@@ -78,7 +83,7 @@ export function DatabaseMonitoring() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Database className="h-5 w-5 text-blue-500" />
-                <span className="text-sm font-medium">Taille de la DB</span>
+                <span className="text-sm font-medium">{t('DatabaseMonitoring.dbSizeLabel')}</span>
               </div>
               <div className="text-2xl font-bold">{dbStats.size}</div>
             </CardContent>
@@ -88,7 +93,7 @@ export function DatabaseMonitoring() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="h-5 w-5 text-green-500" />
-                <span className="text-sm font-medium">Requêtes/sec</span>
+                <span className="text-sm font-medium">{t('DatabaseMonitoring.queriesPerSecondLabel')}</span>
               </div>
               <div className="text-2xl font-bold">{dbStats.queriesPerSecond}</div>
             </CardContent>
@@ -98,7 +103,7 @@ export function DatabaseMonitoring() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Settings className="h-5 w-5 text-orange-500" />
-                <span className="text-sm font-medium">Connexions</span>
+                <span className="text-sm font-medium">{t('DatabaseMonitoring.connectionsLabel')}</span>
               </div>
               <div className="text-2xl font-bold">{dbStats.connections}</div>
               <Progress value={dbStats.connections * 5} className="mt-2 h-1" />
@@ -109,9 +114,9 @@ export function DatabaseMonitoring() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Play className="h-5 w-5 text-purple-500" />
-                <span className="text-sm font-medium">Uptime</span>
+                <span className="text-sm font-medium">{t('DatabaseMonitoring.uptimeLabel')}</span>
               </div>
-              <div className="text-lg font-bold">{dbStats.uptime}</div>
+              <div className="text-lg font-bold">{t(`DatabaseMonitoring.uptimeValues.${dbStats.uptimeKey}`)}</div> {/* Traduire le temps de fonctionnement */}
             </CardContent>
           </Card>
         </div>
@@ -119,35 +124,30 @@ export function DatabaseMonitoring() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center gap-2">
-              <CardTitle>Requêtes les Plus Lentes</CardTitle>
+              <CardTitle>{t('DatabaseMonitoring.slowQueriesTitle')}</CardTitle>
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      Requêtes nécessitant une optimisation :<br />
-                      Impact Élevé = Priorité critique.
-                      <br />
-                      L'optimisation automatique améliore les performances.
-                    </p>
+                    <p>{t('DatabaseMonitoring.slowQueriesTooltip')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </div>
             <Button variant="outline" size="sm">
-              Optimiser automatiquement
+              {t('DatabaseMonitoring.optimizeAutomaticallyButton')}
             </Button>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Requête</TableHead>
-                  <TableHead>Durée moyenne</TableHead>
-                  <TableHead>Fréquence</TableHead>
-                  <TableHead>Impact</TableHead>
+                  <TableHead>{t('DatabaseMonitoring.tableHeaders.query')}</TableHead>
+                  <TableHead>{t('DatabaseMonitoring.tableHeaders.averageDuration')}</TableHead>
+                  <TableHead>{t('DatabaseMonitoring.tableHeaders.frequency')}</TableHead>
+                  <TableHead>{t('DatabaseMonitoring.tableHeaders.impact')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -167,19 +167,14 @@ export function DatabaseMonitoring() {
         <Card>
           <CardHeader>
             <div className="flex items-center gap-2">
-              <CardTitle>Tâches de Maintenance</CardTitle>
+              <CardTitle>{t('DatabaseMonitoring.maintenanceTasksTitle')}</CardTitle>
               <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      Maintenance préventive de la base de données :<br />
-                      Réindexation = Améliore les performances.
-                      <br />
-                      Nettoyage = Supprime les données temporaires.
-                    </p>
+                    <p>{t('DatabaseMonitoring.maintenanceTasksTooltip')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -189,20 +184,20 @@ export function DatabaseMonitoring() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2 bg-transparent">
                 <Database className="h-6 w-6" />
-                <span>Réindexation</span>
-                <span className="text-xs text-gray-500">Dernière: Il y a 2 jours</span>
+                <span>{t('DatabaseMonitoring.reindexingTaskTitle')}</span>
+                <span className="text-xs text-gray-500">{t('DatabaseMonitoring.reindexingTaskLastRun')}</span>
               </Button>
 
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2 bg-transparent">
                 <Settings className="h-6 w-6" />
-                <span>Nettoyage</span>
-                <span className="text-xs text-gray-500">Dernière: Il y a 1 semaine</span>
+                <span>{t('DatabaseMonitoring.cleanupTaskTitle')}</span>
+                <span className="text-xs text-gray-500">{t('DatabaseMonitoring.cleanupTaskLastRun')}</span>
               </Button>
 
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2 bg-transparent">
                 <Zap className="h-6 w-6" />
-                <span>Optimisation</span>
-                <span className="text-xs text-gray-500">Dernière: Il y a 3 jours</span>
+                <span>{t('DatabaseMonitoring.optimizationTaskTitle')}</span>
+                <span className="text-xs text-gray-500">{t('DatabaseMonitoring.optimizationTaskLastRun')}</span>
               </Button>
             </div>
           </CardContent>

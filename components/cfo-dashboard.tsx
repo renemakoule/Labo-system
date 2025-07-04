@@ -13,7 +13,10 @@ export function CFODashboard() {
     <DateRangeProvider>
       <SidebarProvider defaultOpen={true}>
         <div className="h-screen flex w-full bg-background overflow-hidden">
-          <DashboardSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <DashboardSidebar 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab}
+          />
           <DashboardContent activeTab={activeTab} />
         </div>
       </SidebarProvider>

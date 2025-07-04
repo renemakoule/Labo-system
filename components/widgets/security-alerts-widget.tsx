@@ -1,3 +1,8 @@
+"use client" // Assurez-vous que ce composant est un client component
+
+// Importez votre hook useLanguage depuis le chemin correct
+import { useLanguage } from '@/context/language-context';
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -5,60 +10,65 @@ import { AlertTriangle, Clock, Info } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export function SecurityAlertsWidget() {
+  // Utilisez votre hook useLanguage
+  const { t } = useLanguage();
+
+  // Les messages d'alerte et les temps sont maintenant des clés pour la traduction
+  // Les IDs de patient comme #1234 sont des interpolations
   const alerts = [
     {
       id: 1,
       type: "warning",
-      message: "5 tentatives de connexion échouées pour l'utilisateur caisse01",
-      time: "Il y a 2h",
+      messageKey: "failedLoginAttempts", // Nouvelle clé pour le message
+      messageValues: { attempts: 5, user: "caisse01" }, // Valeurs pour l'interpolation
+      timeKey: "time2hAgo", // Nouvelle clé pour le temps
       severity: "medium",
     },
     {
       id: 2,
       type: "info",
-      message: "Accès au dossier du patient #1234 en dehors des heures de travail par admin_cfo",
-      time: "Il y a 4h",
+      messageKey: "offHoursPatientAccess",
+      messageValues: { patientId: "#1234", user: "admin_cfo" },
+      timeKey: "time4hAgo",
       severity: "low",
     },
     {
       id: 3,
       type: "warning",
-      message: "Tentative d'accès à la base de données depuis une IP inconnue",
-      time: "Il y a 6h",
+      messageKey: "unknownIpDbAccess",
+      timeKey: "time6hAgo",
       severity: "high",
     },
-  ]
+  ];
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
       case "high":
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Élevé</Badge>
+        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">{t('SecurityAlertsWidget.severity_high')}</Badge>
       case "medium":
-        return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Moyen</Badge>
+        return <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">{t('SecurityAlertsWidget.severity_medium')}</Badge>
       case "low":
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Faible</Badge>
+        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">{t('SecurityAlertsWidget.severity_low')}</Badge>
       default:
-        return <Badge variant="secondary">Info</Badge>
+        return <Badge variant="secondary">{t('SecurityAlertsWidget.severity_info')}</Badge>
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-lg font-medium">Alertes de Sécurité Récentes</CardTitle>
+          <CardTitle className="text-lg font-medium">
+            {t('SecurityAlertsWidget.title')}
+          </CardTitle>
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger asChild>
                 <Info className="h-4 w-4 text-gray-400 hover:text-gray-600" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>
-                  Événements de sécurité récents :<br />
-                  Tentatives de connexion, accès suspects.
-                  <br />
-                  Classés par niveau de sévérité (Élevé/Moyen/Faible).
-                </p>
+                {/* InfoTooltip content is directly translated here */}
+                <p>{t('SecurityAlertsWidget.infoTooltip')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -72,18 +82,19 @@ export function SecurityAlertsWidget() {
               <div className="flex justify-between items-start mb-2">
                 {getSeverityBadge(alert.severity)}
                 <div className="flex items-center text-xs text-gray-500">
-                  <Clock className="h-3 w-3 mr-1" />
-                  {alert.time}
+                  <Clock className="h-3 w-3 me-1" /> {/* `me-1` pour margin-inline-end */}
+                  {t(`SecurityAlertsWidget.timeKeys.${alert.timeKey}`)} {/* Traduire le temps */}
                 </div>
               </div>
-              <p className="text-sm text-gray-700">{alert.message}</p>
+              {/* Traduire le message d'alerte avec interpolation des valeurs */}
+              <p className="text-sm text-gray-700">{t(`SecurityAlertsWidget.alertMessages.${alert.messageKey}`, alert.messageValues)}</p>
             </div>
           ))}
         </div>
 
         <div className="mt-4 pt-4 border-t">
           <Button variant="outline" size="sm" className="w-full bg-transparent">
-            Voir le journal d'audit complet
+            {t('SecurityAlertsWidget.viewFullAuditLogButton')}
           </Button>
         </div>
       </CardContent>

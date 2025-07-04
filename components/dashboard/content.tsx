@@ -1,5 +1,6 @@
 "use client"
 
+import { useLanguage } from "@/context/language-context"; // Importez votre hook de langue
 import { Header } from "@/components/dashboard/header"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { DateRangeFilter } from "@/components/dashboard/date-range-filter"
@@ -18,19 +19,22 @@ interface DashboardContentProps {
   activeTab: string
 }
 
-const tabTitles: Record<string, string> = {
-  overview: "Vue d'Ensemble",
-  "sales-performance": "Performance des Analyses",
-  "sales-channels": "Canaux de Paiement",
-  "treasury-receivables": "Suivi des Créances",
-  "treasury-cashflow": "Flux de Trésorerie",
-  "costs-suppliers": "Dépenses Fournisseurs",
-  "costs-inventory": "Gestion du Stock",
-  "settings-financial": "Paramètres Financiers",
-  "settings-reports": "Générateur de Rapports",
-}
-
 export function DashboardContent({ activeTab }: DashboardContentProps) {
+  const { t } = useLanguage(); // Obtenez la fonction de traduction
+
+  // Mappage des IDs d'onglet aux titres traduits
+  const tabTitles: Record<string, string> = {
+    overview: t('CFOSidebar.overview'), // Réutilise les clés de la sidebar pour la cohérence
+    "sales-performance": t('CFOSidebar.salesPerformance'),
+    "sales-channels": t('CFOSidebar.salesChannels'),
+    "treasury-receivables": t('CFOSidebar.receivablesTracking'),
+    "treasury-cashflow": t('CFOSidebar.cashflow'),
+    "costs-suppliers": t('CFOSidebar.supplierExpenses'),
+    "costs-inventory": t('CFOSidebar.inventoryManagement'),
+    "settings-financial": t('CFOSidebar.financialSettings'),
+    "settings-reports": t('CFOSidebar.reportGenerator'),
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "overview":
@@ -58,9 +62,10 @@ export function DashboardContent({ activeTab }: DashboardContentProps) {
 
   return (
     <SidebarInset className="flex flex-col h-screen">
-      <Header title={tabTitles[activeTab] || "Dashboard"} />
+      {/* Passez le titre traduit au composant Header */}
+      <Header title={tabTitles[activeTab] || t('DashboardContent.defaultTitle')} />
       <div className="flex items-center justify-end p-4 border-b">
-        <DateRangeFilter />
+        <DateRangeFilter /> {/* Ce composant nécessitera aussi des traductions */}
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 md:p-8">

@@ -1,3 +1,8 @@
+//components/prelevement/worklist.tsx
+'use client';
+
+// SUPPRIMER : import { useTranslations } from "next-intl";
+import { useLanguage } from "@/context/language-context"; // UTILISER NOTRE HOOK
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -17,23 +22,32 @@ const worklistData: WorklistItem[] = [
 ];
 
 export default function WorklistJourPage() {
+  // CORRECTION : Utiliser notre hook et les bonnes clés
+  const { t } = useLanguage();
+
+  const getPriorityTranslation = (priority: 'Urgent' | 'Routine') => {
+    return priority === 'Urgent' 
+      ? t('Worklist.priorityUrgent') 
+      : t('Worklist.priorityRoutine');
+  };
+
   return (
     <div className="container mx-auto p-4">
        <PageTitleWithInfo
-        title="Worklist du Jour"
-        infoText="Liste des analyses à effectuer aujourd'hui, triées par priorité."
+        title={t('Worklist.pageTitle')}
+        infoText={t('Worklist.pageInfo')}
       />
       <Card>
-        <CardHeader><CardTitle>Liste de travail du jour</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t('Worklist.cardTitle')}</CardTitle></CardHeader>
         <CardContent>
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID Prélèvement</TableHead>
-                        <TableHead>ID Patient</TableHead>
-                        <TableHead>Analyse</TableHead>
-                        <TableHead>Priorité</TableHead>
-                        <TableHead>Action</TableHead>
+                        <TableHead>{t('Worklist.headerSampleId')}</TableHead>
+                        <TableHead>{t('Worklist.headerPatientId')}</TableHead>
+                        <TableHead>{t('Worklist.headerAnalysis')}</TableHead>
+                        <TableHead>{t('Worklist.headerPriority')}</TableHead>
+                        <TableHead>{t('Worklist.headerAction')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -44,10 +58,10 @@ export default function WorklistJourPage() {
                             <TableCell>{item.analysis}</TableCell>
                             <TableCell>
                                 <Badge variant={item.priority === 'Urgent' ? 'destructive' : 'secondary'}>
-                                    {item.priority}
+                                    {getPriorityTranslation(item.priority)}
                                 </Badge>
                             </TableCell>
-                            <TableCell><Button size="sm">Lancer l'analyse</Button></TableCell>
+                            <TableCell><Button size="sm">{t('Worklist.actionButton')}</Button></TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
